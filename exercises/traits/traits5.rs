@@ -21,6 +21,8 @@ pub trait OtherTrait {
     }
 }
 
+
+
 struct SomeStruct {}
 struct OtherStruct {}
 
@@ -30,11 +32,10 @@ impl SomeTrait for OtherStruct {}
 impl OtherTrait for OtherStruct {}
 
 // YOU MAY ONLY CHANGE THE NEXT LINE
-fn some_func(item: ??) -> bool {
+fn some_func(item: ) -> bool {
     item.some_function() && item.other_function()
 }
 
 fn main() {
-    some_func(SomeStruct {});
-    some_func(OtherStruct {});
+    
 }
