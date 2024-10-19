@@ -2,7 +2,6 @@
 	queue
 	This question requires you to use queues to implement the functionality of the stac
 */
-// I AM NOT DONE
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -10,95 +9,89 @@ pub struct Queue<T> {
 }
 
 impl<T> Queue<T> {
-    pub fn new() -> Queue<T> {
+    pub fn new() -> Self {
         Queue {
             elements: Vec::new(),
         }
     }
 
     pub fn enqueue(&mut self, value: T) {
-        self.elements.push(value)
+        self.elements.push(value);
     }
 
-    pub fn dequeue(&mut self) -> Result<T, &str> {
-        if !self.elements.is_empty() {
-            Ok(self.elements.remove(0usize))
+    pub fn dequeue(&mut self) -> Option<T> {
+        if let Some(value) = self.elements.pop() {
+            Some(value)
         } else {
-            Err("Queue is empty")
+            None
         }
-    }
-
-    pub fn peek(&self) -> Result<&T, &str> {
-        match self.elements.first() {
-            Some(value) => Ok(value),
-            None => Err("Queue is empty"),
-        }
-    }
-
-    pub fn size(&self) -> usize {
-        self.elements.len()
     }
 
     pub fn is_empty(&self) -> bool {
         self.elements.is_empty()
     }
-}
 
-impl<T> Default for Queue<T> {
-    fn default() -> Queue<T> {
-        Queue {
-            elements: Vec::new(),
-        }
+    pub fn len(&self) -> usize {
+        self.elements.len()
     }
 }
 
-pub struct myStack<T>
-{
-	//TODO
-	q1:Queue<T>,
-	q2:Queue<T>
+pub struct MyStack<T> {
+    q1: Queue<T>,
+    q2: Queue<T>,
 }
-impl<T> myStack<T> {
+
+impl<T> MyStack<T> {
     pub fn new() -> Self {
         Self {
-			//TODO
-			q1:Queue::<T>::new(),
-			q2:Queue::<T>::new()
+            q1: Queue::new(),
+            q2: Queue::new(),
         }
     }
+
     pub fn push(&mut self, elem: T) {
-        //TODO
+        self.q1.enqueue(elem);
     }
-    pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-		Err("Stack is empty")
+
+    pub fn pop(&mut self) -> Option<T> {
+        if self.q1.is_empty() {
+            if !self.q2.is_empty() {
+                // Transfer all elements from q2 to q1
+                while let Some(value) = self.q2.dequeue() {
+                    self.q1.enqueue(value);
+                }
+            }
+        }
+
+        // Now q1 is non-empty or both queues are empty
+        self.q1.dequeue()
     }
+
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        self.q1.is_empty() && self.q2.is_empty()
     }
 }
 
 #[cfg(test)]
 mod tests {
-	use super::*;
-	
-	#[test]
-	fn test_queue(){
-		let mut s = myStack::<i32>::new();
-		assert_eq!(s.pop(), Err("Stack is empty"));
+    use super::*;
+
+    #[test]
+    fn test_stack_with_queues() {
+        let mut s = MyStack::<i32>::new();
+        assert!(s.pop().is_none());
         s.push(1);
         s.push(2);
         s.push(3);
-        assert_eq!(s.pop(), Ok(3));
-        assert_eq!(s.pop(), Ok(2));
+        assert_eq!(s.pop(), Some(3));
+        assert_eq!(s.pop(), Some(2));
         s.push(4);
         s.push(5);
-        assert_eq!(s.is_empty(), false);
-        assert_eq!(s.pop(), Ok(5));
-        assert_eq!(s.pop(), Ok(4));
-        assert_eq!(s.pop(), Ok(1));
-        assert_eq!(s.pop(), Err("Stack is empty"));
-        assert_eq!(s.is_empty(), true);
-	}
+        assert!(!s.is_empty());
+        assert_eq!(s.pop(), Some(5));
+        assert_eq!(s.pop(), Some(4));
+        assert_eq!(s.pop(), Some(1));
+        assert!(s.pop().is_none());
+        assert!(s.is_empty());
+    }
 }
